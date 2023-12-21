@@ -1,0 +1,7 @@
+{
+    "terminal.integrated.sendKeybindingsToShell": true,
+    "terminal.integrated.allowChords": false,
+    "files.associations": {
+        "python.defaultInterpreterPath": "/home/badr/anaconda3/bin/python"
+    }
+}
