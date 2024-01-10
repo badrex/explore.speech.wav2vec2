@@ -50,8 +50,8 @@ def get_layer_representations(speech_samples, model):
 
         print(f"{(100*i)/len(speech_samples):.2f}% completed!", end='\r')
 
-        if i == 100:
-            break   
+        #if i == 100:
+            #break   
 
     return layer_reprs
 
@@ -237,7 +237,7 @@ for sample_ID in layer_reprs:
 pickle_file_path = "../wav2vec2_vectors/layer_reprs_large_pt.pkl"
 
 # Save the layer_reprs_large_ft as a pickle object
-print("Extract representations...")
+print("Save representations to desk...")
 with open(pickle_file_path, "wb") as file:
     pickle.dump(layer_reprs, file)
 
@@ -257,10 +257,10 @@ digit2word = {
     9: 'nine'
 }
 
-plot_tsne(tsne_layer_representations_large_pt, labels, digit2word)
+#plot_tsne(tsne_layer_representations_large_pt, labels, digit2word)
 
 
 # Convert the categorical list into a list of integers
-label_encoder = LabelEncoder()
-speaker_ids_encoded = label_encoder.fit_transform(speaker_ids)
+#label_encoder = LabelEncoder()
+#speaker_ids_encoded = label_encoder.fit_transform(speaker_ids)
 
