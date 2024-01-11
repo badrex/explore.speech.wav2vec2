@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import torch
 import torchaudio
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Speech2Text2Processor, SpeechEncoderDecoderModel
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -71,7 +71,7 @@ def calculate_tsne_layer_representations(layer_reprs):
 
     num_layers = len(layer_reprs[list(layer_reprs.keys())[0]])
 
-    for layer_index in range(1, num_layers):
+    for layer_index in range(0, num_layers):
         # Extract representations from the specified layer
         layer_representations = []
 
@@ -209,8 +209,11 @@ for i, sample_ID in enumerate(metadata):
 
 
 # Load pre-trained model and processor
-w2v2_model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-lv60")
-processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-lv60")
+#w2v2_model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h-lv60")
+w2v2_model = SpeechEncoderDecoderModel.from_pretrained("facebook/s2t-wav2vec2-large-en-de")    
+w2v2_model = w2v2_model.encoder
+processor = Speech2Text2Processor.from_pretrained("facebook/s2t-wav2vec2-large-en-de")
+#processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-large-lv60")
 
 
 
@@ -234,7 +237,7 @@ for sample_ID in layer_reprs:
 
 
 # Specify the file path for saving the pickle object
-pickle_file_path = "../wav2vec2_vectors/layer_reprs_large_pt.pkl"
+pickle_file_path = "../wav2vec2_vectors/pt/layer_reprs_large_ft_s2t.pkl"
 
 # Save the layer_reprs_large_ft as a pickle object
 print("Save representations to desk...")
@@ -242,25 +245,27 @@ with open(pickle_file_path, "wb") as file:
     pickle.dump(layer_reprs, file)
 
 
-tsne_layer_representations_large_pt = calculate_tsne_layer_representations(layer_reprs)
+# Calculate mean pooling at the utterance level
+layer_reprs_pooled = defaultdict(list)
 
-digit2word = {
-    0: 'zero',
-    1: 'one',
-    2: 'two',
-    3: 'three',
-    4: 'four',
-    5: 'five',
-    6: 'six',
-    7: 'seven',
-    8: 'eight',
-    9: 'nine'
-}
+for sample_ID in layer_reprs:
 
-#plot_tsne(tsne_layer_representations_large_pt, labels, digit2word)
+    num_layers = len(layer_reprs[list(layer_reprs.keys())[0]])
+
+    for layer_index in range(0, num_layers): 
+
+        layer_reprs_pooled[sample_ID].append(
+            layer_reprs[sample_ID][layer_index].mean(dim=1).squeeze().numpy()
+        )
 
 
-# Convert the categorical list into a list of integers
-#label_encoder = LabelEncoder()
-#speaker_ids_encoded = label_encoder.fit_transform(speaker_ids)
+
+# Specify the file path for saving the pickle object for pooled representations 
+pickle_file_path = "../wav2vec2_vectors/pt/layer_reprs_large_pooled_ft_s2t.pkl"
+
+# Save the layer_reprs_large_ft as a pickle object
+print("Save pooled representations to desk...")
+with open(pickle_file_path, "wb") as file:
+    pickle.dump(layer_reprs_pooled, file)
+
 
