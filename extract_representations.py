@@ -174,7 +174,7 @@ for file in audio_files:
     label, speaker_id, sample_number = file_name.split('_')
     
     # Read audio file
-    audio, sr = librosa.load(file, sr=8000)
+    #audio, sr = librosa.load(file, sr=8000)
     
     # Store audio data
     audio_data[file_name] = audio
